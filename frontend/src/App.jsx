@@ -1,121 +1,102 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useRef } from "react";
+import "./App.css";
+import { io } from "socket.io-client";
+import { useState } from "react";
+
+const socket = io("http://localhost:9000");
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [socketID, setSocketID] = useState("");
+  const [targetId, setTargetId] = useState("");
+  const [message, setMessage] = useState("");
+  const [allMessage, setAllMessage] = useState([]);
+
+  const localVideo = useRef(null);
+  const localStream = useRef(null);
+  const sendMessage = () => {
+    console.log("ruk ja bhej raha hu");
+    if (message.trim()) {
+      setAllMessage((prev) => [
+        ...prev,
+        {
+          targetId: targetId,
+          message: message,
+          isOwn: true,
+        },
+      ]);
+      socket.emit("sender", {
+        targetId: targetId,
+        message: message,
+      });
+    }
+  };
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+      setSocketID(socket.id);
+    });
+    socket.on("receiver", (receiverData) => {
+      setAllMessage((prev) => [
+        ...prev,
+        {
+          receiverData,
+          isOwn: false,
+        },
+      ]);
+    });
+  }, []);
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <div className="outer">
+        <div className="chatSection">
+          <div className="userHeader">{socketID}</div>
+          <div className="chatArea">
+            {allMessage.map((msg, index) => (
+              <div
+                key={index}
+                className={msg.isOwn ? "message own" : "message other"}
+              >
+                <div className="messageSender">
+                  {msg.isOwn ? "You" : msg.receiverData?.sender || "User"}
+                </div>
+                <div className="messageContent">
+                  {msg.message || msg.receiverData?.message}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="inputArea">
+            <input
+              type="text"
+              placeholder="Enter target ID"
+              value={targetId}
+              onChange={(e) => setTargetId(e.target.value)}
+            />
+            <div className="messageInputContainer">
+              <input
+                type="text"
+                placeholder="Enter your message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+              <button onClick={sendMessage}>Send</button>
+            </div>
+          </div>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          {/* chat section ends */}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div className="peerConnection">
+          <div className="videoSection">
+            <h3>Video Connection</h3>
+            <div className="videoContainer">
+              {/* Video implementation will be added here */}
+            </div>
+          </div>
         </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
