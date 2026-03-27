@@ -223,7 +223,15 @@ body {
   min-height: 300px;
   position: relative;
 }
-
+.localVideoContainer{
+  position: fixed;
+  bottom: 10px ;
+  right: 35px;
+}
+.localVideoContainer video{
+  width: 200px;
+  height: 200px;
+}
 .videoContainer::before {
   content: "📹 Video Section";
   text-align: center;

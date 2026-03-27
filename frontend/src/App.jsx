@@ -11,8 +11,31 @@ function App() {
   const [message, setMessage] = useState("");
   const [allMessage, setAllMessage] = useState([]);
 
-  const localVideo = useRef(null);
-  const localStream = useRef(null);
+  const pc=useRef(null)
+
+
+const connectPC=()=>{
+  pc.current=new RTCPeerConnection()
+
+
+
+  //bahut sari chize 
+
+}
+
+  const sendOffer = async() => {
+  connectPC()
+   const offer=await pc.current.createOffer()
+   await pc.current.setLocalDescription(offer)
+
+   socket.emit("offer",{
+    targetId:targetId,
+    offer:offer
+   })
+
+   
+  };
+
   const sendMessage = () => {
     console.log("ruk ja bhej raha hu");
     if (message.trim()) {
@@ -30,11 +53,13 @@ function App() {
       });
     }
   };
+
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id); // x8WIv7-mJelg7on_ALbx
       setSocketID(socket.id);
     });
+
     socket.on("receiver", (receiverData) => {
       setAllMessage((prev) => [
         ...prev,
@@ -81,6 +106,7 @@ function App() {
                 onChange={(e) => setMessage(e.target.value)}
               />
               <button onClick={sendMessage}>Send</button>
+              <button onClick={sendOffer}>Send Offer</button>
             </div>
           </div>
 
