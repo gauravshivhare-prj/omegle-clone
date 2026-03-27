@@ -11,11 +11,14 @@ function App() {
   const [message, setMessage] = useState("");
   const [allMessage, setAllMessage] = useState([]);
   const [localVideoStream, setLocalVideoStream] = useState(null) /// thodi der me. 
+  const [remoteVideoStream, setRemoteVideoStream] = useState(null) /// thodi der me. 
 
 
   const pc = useRef(null);
   const remoteRef = useRef(null)
   const localVideoRef = useRef(null)
+  const remoteVideoRef = useRef(null)
+
 
 
 
@@ -50,6 +53,19 @@ function App() {
     };
 
 
+    pc.current.ontrack=(event)=>{
+
+      console.log(event.streams[0])
+      setRemoteVideoStream(event.streams[0])
+
+      remoteVideoRef.current.srcObject=event.streams[0]
+      
+
+      
+
+    }
+
+
 
 
   };
@@ -60,7 +76,13 @@ function App() {
 
     remoteRef.current = targetId;
     console.log("Remote ID stored:", remoteRef.current);
+
+
+
+
     let stream=localVideoStream
+
+
     if (!localVideoStream) {
       stream =await getCamera()
     }
@@ -112,7 +134,7 @@ function App() {
     try {
 
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      setLocalVideoStream(stream)
+
       localVideoRef.current.srcObject = stream
 
       return stream
@@ -256,6 +278,9 @@ function App() {
               {/* Video implementation will be added here */}
               <div className="localVideoContainer">
                 <video ref={localVideoRef} autoPlay playsInline muted/>
+              </div>
+              <div className="remoteVideoContainer">
+                <video ref={remoteVideoRef} autoPlay playsInline />
               </div>
 
 
