@@ -22,7 +22,7 @@ body {
 .chatSection {
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 30%;
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -187,7 +187,7 @@ body {
 /* =============== PEER CONNECTION SECTION =============== */
 .peerConnection {
   display: flex;
-  width: 50%;
+  width: 70%;
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -213,30 +213,94 @@ body {
 
 .videoContainer {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
+  background: #1a1a1a;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 16px;
-  min-height: 300px;
+  min-height: 500px;
   position: relative;
+  overflow: hidden;
 }
-.localVideoContainer{
-  position: fixed;
-  bottom: 10px ;
-  right: 35px;
+
+/* Remote Video - Full Size */
+.remoteVideoContainer {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.localVideoContainer video{
-  width: 200px;
-  height: 200px;
+
+.remoteVideoContainer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
 }
-.videoContainer::before {
-  content: "📹 Video Section";
-  text-align: center;
-  opacity: 0.7;
+
+.remoteVideoContainer::before {
+  content: "Waiting for peer...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
   font-weight: 600;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hide "Waiting for peer..." when video is connected */
+.remoteVideoContainer:has(.remote-video[srcObject])::before {
+  content: none;
+}
+
+/* Local Video - Small Picture-in-Picture */
+.localVideoContainer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 180px;
+  height: 135px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.localVideoContainer:hover {
+  transform: scale(1.05);
+  border-color: rgba(102, 126, 234, 0.8);
+}
+
+.localVideoContainer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.localVideoContainer::before {
+  content: "You";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 11;
 }
 
 /* =============== SCROLLBAR STYLING =============== */
@@ -273,6 +337,13 @@ body {
   .message {
     max-width: 85%;
   }
+
+  .localVideoContainer {
+    width: 150px;
+    height: 112px;
+    bottom: 15px;
+    right: 15px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -296,5 +367,16 @@ body {
 
   .messageInputContainer button {
     width: 100%;
+  }
+
+  .localVideoContainer {
+    width: 120px;
+    height: 90px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .videoContainer {
+    min-height: 400px;
   }
 }
